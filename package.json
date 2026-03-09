@@ -1,0 +1,437 @@
+{
+    "name": "cpp-runner-pro",
+    "displayName": "Cpp Runner Pro",
+    "icon": "media/icon.png",
+    "description": "A high-performance VS Code extension for compiling and running C/C++ files with persistent terminal management",
+    "version": "1.1.4",
+    "changelog": "CHANGELOG_EN.md",
+    "license": "MIT",
+    "publisher": "firma",
+    "author": {
+        "name": "firma"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/firma2021/cpp-runner-pro.git"
+    },
+    "bugs": {
+        "url": "https://github.com/firma2021/cpp-runner-pro/issues"
+    },
+    "homepage": "https://github.com/firma2021/cpp-runner-pro#readme",
+    "keywords": [
+        "c++",
+        "cpp",
+        "compiler",
+        "runner",
+        "build",
+        "run",
+        "gcc",
+        "clang",
+        "msvc",
+        "terminal"
+    ],
+    "engines": {
+        "vscode": "^1.106.0"
+    },
+    "categories": [
+        "Other",
+        "Programming Languages",
+        "Debuggers"
+    ],
+    "activationEvents": [
+        "onLanguage:cpp"
+    ],
+    "main": "./dist/extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "cpp-runner-pro.run",
+                "title": "Run C++ File",
+                "category": "C++ Runner Pro",
+                "icon": "$(play)"
+            },
+            {
+                "command": "cpp-runner-pro.showConfigWebview",
+                "title": "Show Configuration",
+                "category": "C++ Runner Pro",
+                "icon": "$(gear)"
+            },
+            {
+                "command": "cpp-runner-pro.projectConfig",
+                "title": "Project Config",
+                "category": "C++ Runner Pro",
+                "icon": "$(settings)"
+            },
+            {
+                "command": "cpp-runner-pro.compile",
+                "title": "Compile C++ File",
+                "category": "C++ Runner Pro",
+                "icon": "$(gear)"
+            },
+            {
+                "command": "cpp-runner-pro.showCompileTerminal",
+                "title": "Show Compile Terminal",
+                "category": "C++ Runner Pro"
+            },
+            {
+                "command": "cpp-runner-pro.showRunTerminals",
+                "title": "Show Running Terminals",
+                "category": "C++ Runner Pro"
+            },
+            {
+                "command": "cpp-runner-pro.closeAllTerminals",
+                "title": "Close All Terminals",
+                "category": "C++ Runner Pro"
+            }
+        ],
+        "menus": {
+            "editor/title": [
+                {
+                    "command": "cpp-runner-pro.run",
+                    "when": "resourceLangId == 'cpp'",
+                    "group": "navigation@1",
+                    "icon": "$(play)",
+                    "tooltip": "Run C++ file"
+                }
+            ],
+            "statusBar": [
+                {
+                    "command": "cpp-runner-pro.showConfigWebview",
+                    "alignment": "left",
+                    "text": "$(gear) C++ Runner",
+                    "tooltip": "Open C++ Runner configuration",
+                    "when": "resourceLangId == 'cpp'"
+                }
+            ],
+            "editor/context": [
+                {
+                    "command": "cpp-runner-pro.run",
+                    "when": "(resourceLangId == 'cpp')",
+                    "group": "navigation@2"
+                }
+            ]
+        },
+        "keybindings": [
+            {
+                "command": "cpp-runner-pro.run",
+                "key": "ctrl+f6",
+                "mac": "cmd+f6",
+                "when": "editorTextFocus && (editorLangId == 'cpp')"
+            }
+        ],
+        "configuration": {
+            "title": "C++ Runner Pro",
+            "properties": {
+                "cpp-runner-pro.excludedFileExtensions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "uniqueItems": true,
+                    "default": [
+                        ".h",
+                        ".hpp",
+                        ".hh",
+                        ".hxx",
+                        ".inl"
+                    ],
+                    "description": "File extensions to exclude from compile/run operations (include the leading dot), e.g. header file extensions."
+                },
+                "cpp-runner-pro.outputDirectory": {
+                    "type": "string",
+                    "default": "./build",
+                    "description": "Executable output directory (relative to workspace root)"
+                },
+                "cpp-runner-pro.compiler": {
+                    "type": "string",
+                    "enum": [
+                        "gcc",
+                        "clang",
+                        "msvc"
+                    ],
+                    "default": "gcc",
+                    "description": "Default compiler name for C++"
+                },
+                "cpp-runner-pro.standard": {
+                    "type": "string",
+                    "enum": [
+                        "c++11",
+                        "c++14",
+                        "c++17",
+                        "c++20",
+                        "c++23",
+                        "c++26"
+                    ],
+                    "default": "c++23",
+                    "description": "Default C++ standard"
+                },
+                "cpp-runner-pro.buildMode": {
+                    "type": "string",
+                    "enum": [
+                        "debug",
+                        "release"
+                    ],
+                    "default": "debug",
+                    "description": "Default build mode for C++"
+                },
+                "cpp-runner-pro.treatWarningsAsErrors": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Treat compiler warnings as errors (adds -Werror or /WX where supported)."
+                },
+                "cpp-runner-pro.themeColor": {
+                    "type": "string",
+                    "enum": [
+                        "magenta",
+                        "rose",
+                        "pink",
+                        "orange",
+                        "yellow",
+                        "green",
+                        "teal",
+                        "blue",
+                        "purple",
+                        "brown",
+                        "grey",
+                        "black"
+                    ],
+                    "default": "magenta",
+                    "description": "Theme color for the configuration webview"
+                },
+                "cpp-runner-pro.gcc.path": {
+                    "type": "string",
+                    "default": "g++",
+                    "description": "Path to g++ executable"
+                },
+                "cpp-runner-pro.clang.path": {
+                    "type": "string",
+                    "default": "clang++",
+                    "description": "Path to clang++ executable"
+                },
+                "cpp-runner-pro.msvc.path": {
+                    "type": "string",
+                    "default": "cl.exe",
+                    "description": "Path to cl.exe"
+                },
+                "cpp-runner-pro.gcc.warnings_options": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "uniqueItems": true,
+                    "default": [
+                        "-Wall",
+                        "-Wextra",
+                        "-Wpedantic"
+                    ],
+                    "description": "Default warning options"
+                },
+                "cpp-runner-pro.clang.warnings_options": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "uniqueItems": true,
+                    "default": [
+                        "-Wall",
+                        "-Wextra",
+                        "-Wpedantic"
+                    ],
+                    "description": "Default warning options"
+                },
+                "cpp-runner-pro.msvc.warnings_options": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "uniqueItems": true,
+                    "default": [
+                        "/W4"
+                    ],
+                    "description": "Warning level (e.g., /W4). Change to /Wall if desired."
+                },
+                "cpp-runner-pro.gcc.debug_options": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "uniqueItems": true,
+                    "default": [
+                        "-Og",
+                        "-g3"
+                    ],
+                    "description": "Additional compiler options for Debug mode"
+                },
+                "cpp-runner-pro.clang.debug_options": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "uniqueItems": true,
+                    "default": [
+                        "-Og",
+                        "-g3"
+                    ],
+                    "description": "Additional compiler options for Debug mode"
+                },
+                "cpp-runner-pro.msvc.debug_options": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "uniqueItems": true,
+                    "default": [
+                        "/Zi",
+                        "/Od"
+                    ],
+                    "description": "Additional compiler options for Debug mode"
+                },
+                "cpp-runner-pro.gcc.release_options": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "uniqueItems": true,
+                    "default": [
+                        "-O3",
+                        "-DNDEBUG"
+                    ],
+                    "description": "Additional compiler options for Release mode"
+                },
+                "cpp-runner-pro.clang.release_options": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "uniqueItems": true,
+                    "default": [
+                        "-O3",
+                        "-DNDEBUG"
+                    ],
+                    "description": "Additional compiler options for Release mode"
+                },
+                "cpp-runner-pro.msvc.release_options": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "uniqueItems": true,
+                    "default": [
+                        "/O2",
+                        "/DNDEBUG"
+                    ],
+                    "description": "Additional compiler options for Release mode"
+                },
+                "cpp-runner-pro.gcc.sanitizers_options": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "address",
+                            "leak",
+                            "undefined",
+                            "thread"
+                        ]
+                    },
+                    "uniqueItems": true,
+                    "default": [
+                        "address",
+                        "leak",
+                        "undefined"
+                    ],
+                    "description": ""
+                },
+                "cpp-runner-pro.clang.sanitizers_options": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "address",
+                            "leak",
+                            "undefined",
+                            "memory",
+                            "thread"
+                        ]
+                    },
+                    "uniqueItems": true,
+                    "default": [
+                        "address",
+                        "leak",
+                        "undefined"
+                    ],
+                    "description": ""
+                },
+                "cpp-runner-pro.msvc.sanitizers_options": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "address"
+                        ]
+                    },
+                    "uniqueItems": true,
+                    "default": [
+                        "address"
+                    ],
+                    "description": ""
+                },
+                "cpp-runner-pro.defines": {
+                    "scope": "resource",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "uniqueItems": true,
+                    "default": [ ],
+                    "description": "Additional preprocessor defines"
+                },
+                "cpp-runner-pro.linked_libraries": {
+                    "scope": "resource",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "uniqueItems": true,
+                    "default": [ ],
+                    "description": "Additional linker flags as a list of tokens"
+                },
+                "cpp-runner-pro.programArgs": {
+                    "scope": "resource",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [ ],
+                    "description": "Program arguments passed when running the compiled executable"
+                }
+            }
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "pnpm run package",
+        "compile": "pnpm run check-types && pnpm run lint && node esbuild.js",
+        "watch": "npm-run-all -p watch:*",
+        "watch:esbuild": "node esbuild.js --watch",
+        "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+        "package": "pnpm run check-types && pnpm run lint && node esbuild.js --production",
+        "compile-tests": "tsc -p . --outDir out",
+        "watch-tests": "tsc -p . -w --outDir out",
+        "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
+        "check-types": "tsc --noEmit",
+        "lint": "eslint src",
+        "test": "vscode-test"
+    },
+    "devDependencies": {
+        "@types/mocha": "^10.0.10",
+        "@types/node": "20.x",
+        "@types/vscode": "^1.106.0",
+        "@typescript-eslint/eslint-plugin": "^8.31.1",
+        "@typescript-eslint/parser": "^8.31.1",
+        "@vscode/test-cli": "^0.0.10",
+        "@vscode/test-electron": "^2.5.2",
+        "esbuild": "^0.25.3",
+        "eslint": "^9.25.1",
+        "npm-run-all": "^4.1.5",
+        "typescript": "^5.8.3"
+    }
+}

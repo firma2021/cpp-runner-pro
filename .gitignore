@@ -1,0 +1,37 @@
+# Build output
+out/
+dist/
+
+# Dependencies
+node_modules/
+
+# VS Code extension package
+*.vsix
+
+# VS Code test
+.vscode-test/
+
+# VS Code workspace settings (optional - uncomment if you don't want to share)
+# .vscode/
+
+# IDE/Editor configs
+.marscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test coverage
+coverage/
+
+# Temporary files
+*.tmp
+*.temp
+
+# VS Code extension quickstart (not needed for users)
+vsc-extension-quickstart.md
