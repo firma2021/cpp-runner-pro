@@ -7,7 +7,7 @@ import { TaskManager } from './taskManager';
 import { disposeTerminalManager, getTerminalManager } from './terminalManager';
 
 // Extension version
-const EXTENSION_VERSION = '1.1.4';
+const EXTENSION_VERSION = '1.1.5';
 
 // Create a global task manager instance
 const taskManager = new TaskManager();
