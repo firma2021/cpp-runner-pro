@@ -28,6 +28,8 @@ export class TaskManager {
     private terminalManager: TerminalManager;
     private isCompiling = false;
     private compileQueue: (() => Promise<void>)[] = [];
+    /** 缓存可执行文件的修改时间，用于判断是否需要重新编译 */
+    private exeMtimeCache: Map<string, number> = new Map();
 
     constructor() {
         this.terminalManager = getTerminalManager();
@@ -89,14 +91,17 @@ export class TaskManager {
                 .replace('${file}', `"${filePath}"`)
                 .replace('${out}', `"${exe}"`);
 
-            // 检查是否需要编译（比较源文件和可执行文件的修改时间）
+            // 检查是否需要编译
+            // 逻辑：如果可执行文件存在，且当前 mtime 与缓存的 mtime 一致，则直接运行
             let needCompile = true;
+            let currentMtime: number | undefined;
             try {
-                const srcStat = fs.statSync(filePath);
                 if (fs.existsSync(exe)) {
                     const exeStat = fs.statSync(exe);
-                    // 如果可执行文件比源文件新，不需要编译
-                    if (exeStat.mtime > srcStat.mtime) {
+                    currentMtime = exeStat.mtimeMs;
+                    const cachedMtime = this.exeMtimeCache.get(exe);
+                    // 如果缓存的 mtime 与当前一致，说明可执行文件没有变化，不需要编译
+                    if (cachedMtime !== undefined && cachedMtime === currentMtime) {
                         needCompile = false;
                     }
                 }
@@ -117,6 +122,14 @@ export class TaskManager {
                 }
 
                 outputChannel.info('Compilation succeeded.');
+
+                // 更新缓存
+                try {
+                    if (fs.existsSync(exe)) {
+                        const newStat = fs.statSync(exe);
+                        this.exeMtimeCache.set(exe, newStat.mtimeMs);
+                    }
+                } catch { }
             }
 
             // 检查可执行文件是否存在
@@ -233,6 +246,13 @@ export class TaskManager {
 
         if (result.exitCode === 0) {
             outputChannel.info('Compilation succeeded.');
+            // 更新缓存
+            try {
+                if (fs.existsSync(exe)) {
+                    const newStat = fs.statSync(exe);
+                    this.exeMtimeCache.set(exe, newStat.mtimeMs);
+                }
+            } catch { }
         } else {
             outputChannel.error(`Compilation failed (exit code: ${result.exitCode}).`);
         }

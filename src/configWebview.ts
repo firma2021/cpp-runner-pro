@@ -113,13 +113,13 @@ export async function showConfigWebview(): Promise<void>
                 await setGlobalCppStandard(message.value);
                 break;
             case 'setOutputDirectory':
-                await setOutputDirectory(message.value);
+                await setOutputDirectory(message.value, true);
                 break;
             case 'setTreatWarningsAsErrors':
-                await setTreatWarningsAsErrors(Boolean(message.value));
+                await setTreatWarningsAsErrors(Boolean(message.value), true);
                 break;
             case 'setExcludedExtensions':
-                await setExcludedFileExtensions(Array.isArray(message.value) ? message.value : []);
+                await setExcludedFileExtensions(Array.isArray(message.value) ? message.value : [], true);
                 break;
             case 'setToolchainPath':
                 await setToolchainPath(message.compiler, message.value || '');

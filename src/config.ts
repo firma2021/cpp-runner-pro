@@ -204,22 +204,25 @@ export async function setGlobalCppStandard(value: string): Promise<void>
     await cfg.update('standard', value, vscode.ConfigurationTarget.Global);
 }
 
-export async function setOutputDirectory(value: string): Promise<void>
+export async function setOutputDirectory(value: string, global: boolean = false): Promise<void>
 {
     outputDirectory = value;
-    await cfg.update('outputDirectory', value, vscode.ConfigurationTarget.Workspace);
+    const target = global ? vscode.ConfigurationTarget.Global : vscode.ConfigurationTarget.Workspace;
+    await cfg.update('outputDirectory', value, target);
 }
 
-export async function setTreatWarningsAsErrors(value: boolean): Promise<void>
+export async function setTreatWarningsAsErrors(value: boolean, global: boolean = false): Promise<void>
 {
     treatWarningsAsErrors = value;
-    await cfg.update('treatWarningsAsErrors', value, vscode.ConfigurationTarget.Workspace);
+    const target = global ? vscode.ConfigurationTarget.Global : vscode.ConfigurationTarget.Workspace;
+    await cfg.update('treatWarningsAsErrors', value, target);
 }
 
-export async function setExcludedFileExtensions(values: string[]): Promise<void>
+export async function setExcludedFileExtensions(values: string[], global: boolean = false): Promise<void>
 {
     excludedFileExtensions = values;
-    await cfg.update('excludedFileExtensions', values, vscode.ConfigurationTarget.Workspace);
+    const target = global ? vscode.ConfigurationTarget.Global : vscode.ConfigurationTarget.Workspace;
+    await cfg.update('excludedFileExtensions', values, target);
 }
 
 export async function setThemeColor(value: string): Promise<void>
