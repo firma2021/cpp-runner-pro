@@ -3,7 +3,7 @@
     "displayName": "Cpp Runner Pro",
     "icon": "media/icon.png",
     "description": "A high-performance VS Code extension for compiling and running C/C++ files with persistent terminal management",
-    "version": "1.1.5",
+    "version": "1.1.6",
     "changelog": "CHANGELOG.md",
     "license": "MIT",
     "publisher": "firma",

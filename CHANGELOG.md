@@ -1,14 +1,15 @@
-# Changelog (English)
+# Changelog
+
+## v1.1.6 — Bug Fixes
 
 ## v1.1.5 — Bug Fixes & Improvements (current)
 
 ### Bug Fixes
 - **Global Settings Bug**: Fixed an issue where `outputDirectory`, `treatWarningsAsErrors`, and `excludedFileExtensions` were incorrectly saved to workspace settings instead of global settings when configured in the Global Settings tab.
-- **Changelog Display**: Renamed `CHANGELOG_EN.md` to `CHANGELOG.md` to ensure proper display on VS Code Marketplace.
+- **Compile Detection Bug**: Fixed an issue where modifying the source file and clicking play again would skip compilation and run the old executable directly. Now correctly compares the source file's current mtime with the cached mtime to detect changes.
 
 ### Improvements
-- **Smart Compile Detection**: Replaced source file timestamp comparison with executable file mtime caching. Now compares the current executable's modification time with the cached value to determine if recompilation is needed. This provides more accurate detection when executables are deleted or modified externally.
-- **Debug Configuration**: Added `.vscode/launch.json` and `.vscode/tasks.json` for easier extension debugging and development.
+- **Smart Compile Detection**: Caches the source file's modification time after successful compilation. On subsequent runs, compares the current mtime with the cached value to determine if recompilation is needed. Skips compilation only when the source file hasn't been modified.
 
 ## v0.3.0 — Persistent Terminal Management
 
@@ -20,7 +21,7 @@
 - **Auto-Compile**: Automatically compiles when source file is modified (compares source and executable modification timestamps).
 
 ### Terminal Behavior
-- **Compile Terminal**: 
+- **Compile Terminal**:
   - Single persistent terminal named "C++ Compile" with gear icon
   - Pre-created at extension activation for consistent ordering
   - Shared for all compilations across the workspace

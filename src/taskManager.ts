@@ -28,8 +28,8 @@ export class TaskManager {
     private terminalManager: TerminalManager;
     private isCompiling = false;
     private compileQueue: (() => Promise<void>)[] = [];
-    /** 缓存可执行文件的修改时间，用于判断是否需要重新编译 */
-    private exeMtimeCache: Map<string, number> = new Map();
+    /** 缓存源代码文件的修改时间，用于判断是否需要重新编译 */
+    private sourceMtimeCache: Map<string, number> = new Map();
 
     constructor() {
         this.terminalManager = getTerminalManager();
@@ -92,18 +92,17 @@ export class TaskManager {
                 .replace('${out}', `"${exe}"`);
 
             // 检查是否需要编译
-            // 逻辑：如果可执行文件存在，且当前 mtime 与缓存的 mtime 一致，则直接运行
+            // 逻辑：比较源代码文件的修改时间，如果比缓存的新则需要重新编译
+            // 如果可执行文件不存在，也需要重新编译
             let needCompile = true;
-            let currentMtime: number | undefined;
+            let currentSourceMtime: number | undefined;
             try {
-                if (fs.existsSync(exe)) {
-                    const exeStat = fs.statSync(exe);
-                    currentMtime = exeStat.mtimeMs;
-                    const cachedMtime = this.exeMtimeCache.get(exe);
-                    // 如果缓存的 mtime 与当前一致，说明可执行文件没有变化，不需要编译
-                    if (cachedMtime !== undefined && cachedMtime === currentMtime) {
-                        needCompile = false;
-                    }
+                const sourceStat = fs.statSync(filePath);
+                currentSourceMtime = sourceStat.mtimeMs;
+                const cachedMtime = this.sourceMtimeCache.get(filePath);
+                // 如果可执行文件存在，且源代码文件 mtime 没有更新，则跳过编译
+                if (fs.existsSync(exe) && cachedMtime !== undefined && currentSourceMtime <= cachedMtime) {
+                    needCompile = false;
                 }
             } catch { }
 
@@ -123,19 +122,10 @@ export class TaskManager {
 
                 outputChannel.info('Compilation succeeded.');
 
-                // 更新缓存
-                try {
-                    if (fs.existsSync(exe)) {
-                        const newStat = fs.statSync(exe);
-                        this.exeMtimeCache.set(exe, newStat.mtimeMs);
-                    }
-                } catch { }
-            }
-
-            // 检查可执行文件是否存在
-            if (!fs.existsSync(exe)) {
-                outputChannel.error('Executable not found after compilation.');
-                return;
+                // 更新缓存：记录编译成功时源代码文件的 mtime
+                if (currentSourceMtime !== undefined) {
+                    this.sourceMtimeCache.set(filePath, currentSourceMtime);
+                }
             }
 
             // 执行运行
@@ -246,12 +236,10 @@ export class TaskManager {
 
         if (result.exitCode === 0) {
             outputChannel.info('Compilation succeeded.');
-            // 更新缓存
+            // 更新缓存：记录编译成功时源代码文件的 mtime
             try {
-                if (fs.existsSync(exe)) {
-                    const newStat = fs.statSync(exe);
-                    this.exeMtimeCache.set(exe, newStat.mtimeMs);
-                }
+                const sourceStat = fs.statSync(filePath);
+                this.sourceMtimeCache.set(filePath, sourceStat.mtimeMs);
             } catch { }
         } else {
             outputChannel.error(`Compilation failed (exit code: ${result.exitCode}).`);
